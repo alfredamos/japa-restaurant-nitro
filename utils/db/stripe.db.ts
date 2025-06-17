@@ -14,15 +14,15 @@ export class StripeDb {
 
   async paymentCheckout(orderPayload: OrderPayload, origin: string) {
     //----> Destructure orderPayload.
-    const { cartItems } = orderPayload;
+    const { orderDetails } = orderPayload;
 
     const session = await this.stripe.checkout.sessions.create({
       line_items: [
-        ...cartItems?.map((cart) => ({
+        ...orderDetails?.map((cart) => ({
           price_data: {
             currency: "usd",
             product_data: {
-              name: cart.name,
+              name: cart.itemName,
               images: [cart.image],
             },
             unit_amount: cart.price * 100,

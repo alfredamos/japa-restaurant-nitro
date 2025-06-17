@@ -10,6 +10,7 @@ export async function changePasswordAction(changePasswordModel: ChangePasswordMo
   //----> Get the payload.
   const { email, confirmPassword, oldPassword, newPassword } =
     changePasswordModel;
+  
   //----> Change the password and store the updated user credentials in the database.
   return await authDb.changePassword({
     email,
@@ -23,8 +24,8 @@ export async function editProfileAction(editProfileModel: EditProfileModel) {
   //----> Get the edit-profile from form data.
   const { address, name, email, phone, image, gender, password } =
     editProfileModel;
+  
   //----> edit user profile and store it in the database.
-
   const updatedUser = await authDb.editProfile({
     address,
     name,
@@ -34,6 +35,7 @@ export async function editProfileAction(editProfileModel: EditProfileModel) {
     gender,
     password,
   });
+
   //----> send back response.
   return updatedUser
 }
@@ -46,26 +48,14 @@ export async function loginWithoutAuthAction(loginModel: LoginModel, secret: str
 }
 
 export async function loginAction(loginModel: LoginModel) {
-  //const {signIn} = useAuth();
   //----> Get the user credentials from the request.
   const loginCredentials = loginModel;
+  
   //----> Destructure formData.
   const { email, password } = loginCredentials;
-  /* //----> Login the user in.
-   return await signIn("credentials", {
-    email,
-    password,
-    redirect: false,
-  }); */  
-}
-
-export async function logoutAction() {
-  //const {signOut} = useAuth()
-  //await signOut({ redirect: true });
 }
 
 export async function signupAction(signupModel: SignupModel) {
-  
   //----> Get the user credentials from the request.
    const {
     address,
@@ -89,8 +79,8 @@ export async function signupAction(signupModel: SignupModel) {
     confirmPassword,
     password,
   });
-  //----> send back response.
 
+  //----> send back response.
   return newUser 
 }
 
@@ -101,6 +91,7 @@ export async function currentUserAction(id: string) {
   //----> Send back the response.
   return userCurrent;
 }
+
 export async function getCurrentUserAction(email: string) {
   //----> Get the current user from the database.
   const userCurrent = await authDb.getCurrentUser(email);

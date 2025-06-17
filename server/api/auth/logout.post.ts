@@ -1,5 +1,6 @@
 import { initialUserCredential } from '~~/utils/initialUserCredentials';
 import { useAuth } from '~~/utils/useAuth';
+
 export default defineEventHandler((event) => {
   //----> Get the remove-auth-function
   const auth = useAuth();

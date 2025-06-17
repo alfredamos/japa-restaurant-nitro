@@ -1,9 +1,10 @@
 import {z} from 'zod';
 
-export const pizzaSchema = z.object({
+export const menuItemSchema = z.object({
   id: z.string().optional().default(""),
   name: z.string(),
-  topping: z.string(),
+  category: z.string(),
+  specialTag: z.string(),
   price: z.number(),
   quantity: z.number(),
   image: z.string(),

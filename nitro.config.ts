@@ -1,7 +1,7 @@
 //https://nitro.unjs.io/config
 export default defineNitroConfig({
   srcDir: "server",
-  compatibilityDate: "latest",
+  compatibilityDate: "2025-06-17",
 
   experimental: {
     asyncContext: true,

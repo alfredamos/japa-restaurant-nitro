@@ -6,10 +6,10 @@ import type { OrderProduct } from "~~/models/orders/orderProduct.model";
 
 export const createOrderAction = async (orderProduct: OrderProduct) => {
     //----> Get the order info from the request body.
-    const {cartItems, order} = orderProduct;
+    const {orderDetails, order} = orderProduct;
 
     //----> Store the new order info in the database.
-    const createdOrder = await orderDb.createOrder(cartItems, order);
+    const createdOrder = await orderDb.createOrder(orderDetails, order);
 
     //----> Send back the response.
     return createdOrder;
@@ -55,14 +55,14 @@ export const getAllOrdersAction = async () => {
 
     //----> Send back the response.
     return allOrders;
-  };
+};
 
 export const getAllOrdersByUserIdAction = async (userId: string) => {
     //----> Get all orders from the database.
     const allOrders = await orderDb.getAllOrdersByUserId(userId);
     //----> Send back the response.
     return allOrders;
-  };
+};
 
 export const getOrderByIdAction = async (id: string) => {
     //----> Check for the existence of order in the db.
@@ -70,18 +70,5 @@ export const getOrderByIdAction = async (id: string) => {
 
     //----> Send back the response.
     return order;
-  };
+};
 
-export const orderDeliveredAction = async (orderId: string) => {
-    //----> Update the delivering information.
-    const updatedOrder = await orderDb.orderDelivered(orderId);
-    //----> Send back the response
-    return updatedOrder;
-  };
-
-export const orderShippedAction = async (orderId: string) => {
-    //----> Update the shipping information.
-    const updatedOrder = await orderDb.orderShipped(orderId);
-    //----> Send back the response
-    return updatedOrder;
-  };

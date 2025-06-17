@@ -53,7 +53,7 @@ model Order {
 
 model MenuItem {
   id           String        @id @default(uuid())
-  name         String        @db.VarChar(255)
+  itemName     String        @db.VarChar(255)
   category     String        @db.VarChar(255)
   price        Float
   specialTag   String        @db.VarChar(255)
