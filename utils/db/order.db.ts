@@ -1,0 +1,290 @@
+import { StatusCodes } from "http-status-codes";
+import prisma from "./prisma.db";
+import { type OrderDetail, type Order, Status } from "@prisma/client";
+import type { OrderPayload } from "~~/models/orders/orderPayload.model";
+
+export class OrderDb {
+  constructor() {}
+
+  async orderCreate(orderPayload: OrderPayload) {
+    console.log({ orderPayload });
+
+    const { orderDetails, ...rest } = orderPayload;
+
+    const createdOrder = await prisma.order.create({
+      data: {
+        ...rest,
+      },
+    });
+
+    //----> Insert the order-details in the database.
+    const newOrderDetails = await this.createBatchOrderDetails(
+      orderDetails,
+      createdOrder?.id
+    );
+
+    //----> Send back the results.
+    return { createdOrder, orderDetails: newOrderDetails };
+  }
+
+  async createOrder(orderDetails: OrderDetail[], order: Order) {
+    //----> Store the new order info in the database.
+    const createdOrder = await prisma.order.create({
+      data: {
+        ...order,
+        orderDate: new Date(),
+        orderDetails: {
+          create: [...orderDetails ],
+        },
+      },
+      include: {
+        orderDetails: true,
+      },
+    });
+
+    return createdOrder;
+  }
+
+  async deleteAllOrderDetailByOrderId(orderId: string) {
+    //----> Check for the existence of order in the database.
+    const retrieveOrder = await this.getOrderById(orderId);
+    //----> Adjust the total cost and total quantity on the order.
+    const modifiedOrder = this.adjustTotalPriceAndTotalQuantity(retrieveOrder);
+    //----> Delete the order info from the database.
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        ...modifiedOrder,
+        orderDetails: {
+          deleteMany: {},
+        },
+      },
+      include: {
+        orderDetails: true,
+      },
+    });
+    //----> Clean up the order cart.
+    await prisma.order.delete({ where: { id: orderId } });
+  }
+
+  async deleteOneOrderDetailByOrderId(orderDetailId: string, orderId: string) {
+    //----> Check for the existence of order in the database.
+    const { orderDetails, ...rest } = await this.getOrderById(orderId, true);
+    //----> Filter out the cart-item to be deleted.
+    const filteredOrderDetails = this.orderDetailFilter(orderDetails, orderDetailId);
+    //----> Adjust the total cost and total quantity on the order.
+    const modifiedOrder = this.adjustTotalPriceAndTotalQuantity(
+      rest,
+      filteredOrderDetails
+    );
+    //----> Delete the order info from the database.
+    const deletedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        ...modifiedOrder,
+        orderDetails: {
+          deleteMany: [{ id: orderDetailId }],
+        },
+      },
+      include: {
+        orderDetails: true,
+      },
+    });
+
+    return { deletedOrder, filteredOrderDetails };
+  }
+
+  async deleteOrderById(id: string) {
+    //----> Check for the existence of order in the database.
+    await this.getOrderById(id);
+    //----> Delete all associated cart-items.
+    await prisma.order.update({
+      where: { id },
+      data: {
+        orderDetails: {
+          deleteMany: {},
+        },
+      },
+      include: {
+        orderDetails: true,
+        user: true
+      },
+    });
+    //----> Delete the order info from the database.
+    const deletedOrder = await prisma.order.delete({ where: { id } ,include: {orderDetails: true, user: true}});
+
+    return deletedOrder;
+  }
+
+  async deleteOrdersByUserId(userId: string) {
+    //----> Get the customer with the user-id.
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage:"Invalid credentials!"});
+    }
+
+    //----> Get all the orders by customerId.
+    const orders = await prisma.order.findMany({
+      where: { userId: user?.id },
+    });
+    //----> Delete all these others in the database.
+    this.allOrdersDeletedByUserId(orders, user?.id);
+  }
+
+  async editAllOrderDetailsByOrderId(
+    orderId: string,
+    orderDetails: OrderDetail[],
+    order: Order
+  ) {
+    //----> Adjust the total-price and total-quantity on order.
+    const modifiedOrder = this.adjustTotalPriceAndTotalQuantity(
+      order,
+      orderDetails
+    );
+    //----> Store the edited order info in the database.
+    const editedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { ...modifiedOrder },
+    });
+    //----> Edit all cart-items.
+    const updatedOrderDetails = await this.updateAllOrderDetails(orderDetails, orderId);
+
+    return { editedOrder, updatedOrderDetails };
+  }
+
+  async editOrder(id: string, orderToEdit: Order) {
+    //----> Check for the existence of order in the db.
+    await this.getOrderById(id);
+    //----> Store the edited order info in the database.
+    const editedOrder = await prisma.order.update({
+      where: { id },
+      data: { ...orderToEdit },
+    });
+
+    return editedOrder;
+  }
+
+  async getAllOrders() {
+    //----> Get all the orders from the database.
+    const allOrders = await prisma.order.findMany({
+      include: { orderDetails: true, user: true },
+    });
+
+    return allOrders;
+  }
+
+  async getAllOrdersByUserId(userId: string) {
+    //----> Get all the orders from the database.
+    const allOrders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        orderDetails: true,
+        user: true,
+      },
+    });
+
+    return allOrders;
+  }
+
+  async getOneOrder(id: string) {
+    //----> Check for the existence of order in the db.
+    const order = await this.getOrderById(id, true);
+
+    return order;
+  }
+
+
+  private async getOrderById(id: string, include: boolean = false) {
+    //----> Retrieve the order info with this id from database.
+    const order = await prisma.order.findUniqueOrThrow({
+      where: { id },
+      include: {
+        orderDetails: include,
+      },
+    });
+    //----> Send back a valid order.
+    return order;
+  }
+
+  private orderDetailFilter(
+    orderDetails: OrderDetail[],
+    orderDetailId: string
+  ): OrderDetail[] {
+    return orderDetails?.filter((carItem) => carItem.id !== orderDetailId);
+  }
+
+  private adjustTotalPriceAndTotalQuantity(
+    order: Order,
+    orderDetails: OrderDetail[] = []
+  ): Order {
+    //----> Calculate both the total cost and total quantity.
+    const totalQuantity = orderDetails?.reduce(
+      (acc, current) => acc + current.quantity,
+      0
+    );
+    const totalPrice = orderDetails?.reduce(
+      (acc, current) => acc + current.price * current.quantity,
+      0
+    );
+    //----> Adjust the total cost and total quantity on the order.
+    order.totalPrice = totalPrice;
+    order.totalQuantity = totalQuantity;
+    //----> Return the modified order.
+    return order;
+  }
+
+
+  private async createBatchOrderDetails(orderDetails : OrderDetail[], orderId: string){
+    //----> Include the order-id in the order-details.
+    const ordDetails = orderDetails.map((ordDet: OrderDetail) => ({...ordDet, orderId}))
+    
+    //----> Insert all the order-details in the database.
+    return await prisma.orderDetail.createMany({
+      data: [
+        ...ordDetails
+      ],
+      skipDuplicates: true, // Skip duplicate order-details
+    });
+  }
+
+  private updateAllOrderDetails(orderDetails: OrderDetail[], orderId: string) {
+    //----> Edit all cart-items at once.
+    const editedAllCarItems = orderDetails.map(async (cart) => {
+      return await prisma.orderDetail.update({
+        where: { id: cart.id, orderId },
+        data: { ...cart },
+      });
+    });
+
+    //----> Collect all edited cart-items in Promise.all().
+    const updatedOrderDetails = Promise.all(editedAllCarItems);
+
+    //----> Return the updated cart-items.
+
+    return updatedOrderDetails;
+  }
+
+  private allOrdersDeletedByUserId(orders: Order[], userId: string) {
+    //----> Delete all orders by customerId
+    const userOrders = orders?.filter((order) => order.userId === userId);
+    userOrders?.forEach(async (order) => {
+      //----> Delete all associated cart-items.
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          orderDetails: {
+            deleteMany: {},
+          },
+        },
+        include: {
+          orderDetails: true,
+        },
+      });
+      //----> Delete the order info from the database.
+      await prisma.order.delete({ where: { id: order.id } });
+    });
+  }
+}
+
+export const orderDb = new OrderDb();
