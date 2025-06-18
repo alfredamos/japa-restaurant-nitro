@@ -1,4 +1,3 @@
-import { isAdminRoute } from "~~/utils/adminRoutes";
 import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler((event) => {

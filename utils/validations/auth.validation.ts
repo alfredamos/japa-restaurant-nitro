@@ -31,6 +31,7 @@ export const signupSchema = z.object({
   gender: z.enum(["Male", "Female"]),  
   confirmPassword: z.string(),
   password: z.string(),
+  role: z.string().optional(),
   image: z.string().optional()
 }).refine((values) => values.password === values.confirmPassword) 
   

@@ -66,6 +66,7 @@ export async function signupAction(signupModel: SignupModel) {
     confirmPassword,
     password,
     gender,
+    role
   } = signupModel;
 
   //----> Store the new user credentials in the database.
@@ -78,6 +79,8 @@ export async function signupAction(signupModel: SignupModel) {
     gender,
     confirmPassword,
     password,
+    role 
+    
   });
 
   //----> send back response.

@@ -133,6 +133,7 @@ export class AuthDb {
   }
 
   async signup(signupModel: SignupModel) {
+    console.log({signupModel})
     //----> Destructure the payload.
     const { email, password, confirmPassword, ...rest } = signupModel;
 
@@ -144,7 +145,7 @@ export class AuthDb {
 
     //----> Store the new user in the database.
     const newUser = await prisma.user.create({
-      data: { ...rest, password: hashNewPassword, email },
+      data: { ...rest, password: hashNewPassword, email, role: rest.role },
     });
 
     //----> Destructure the user payload to take out the password.

@@ -9,12 +9,12 @@ datasource db {
 
 model OrderDetail {
   id         String    @id @default(uuid())
-  itemName   String
+  itemName   String    @db.VarChar(255)
   price      Float
   quantity   Int
-  menuItemId String?
-  orderId    String?
-  image      String
+  menuItemId String?   @db.VarChar(255)
+  orderId    String?   @db.VarChar(255)
+  image      String    @db.VarChar(255)
   menuItem   MenuItem? @relation(fields: [menuItemId], references: [id])
   order      Order?    @relation(fields: [orderId], references: [id])
 
@@ -39,13 +39,13 @@ model User {
 
 model Order {
   id            String        @id @default(uuid())
-  paymentId     String        @unique @db.VarChar(255)
+  paymentId     String        @unique @db.VarChar(255) @default("wyhjuu4785ndndrnv89")
   orderDate     DateTime
   totalQuantity Int
   totalPrice    Float
   orderDetails  OrderDetail[]
   user          User          @relation(fields: [userId], references: [id])
-  userId        String
+  userId        String        @db.VarChar(255)
   status        Status        @default(Confirmed)
 
   @@map("orders")
@@ -61,7 +61,7 @@ model MenuItem {
   description  String        @db.VarChar(255)
   orderDetails OrderDetail[]
   user         User          @relation(fields: [userId], references: [id])
-  userId       String
+  userId       String        @db.VarChar(255)
 
   @@map("menu-items")
 }

@@ -1,5 +1,5 @@
-import { initialUserCredential } from '~~/utils/initialUserCredentials';
-import { useAuth } from '~~/utils/useAuth';
+import { initialUserCredential } from "~~/utils/initialUserCredentials";
+import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler((event) => {
   //----> Get the remove-auth-function
@@ -9,5 +9,5 @@ export default defineEventHandler((event) => {
   auth.removeAuth();
 
   //----> Return empty auth-response.
-  return initialUserCredential
-})
+  return { message: "Logout is successful!", status: "success" };
+});
