@@ -50,6 +50,13 @@ export class OrderDb {
     return createdOrder;
   }
 
+  async deleteAllOrders() {
+    //----> Delete all the order-details first.
+    await prisma.orderDetail.deleteMany({});
+
+    //----> Delete all orders.
+    await prisma.order.deleteMany({});
+  }
   async deleteAllOrderDetailByOrderId(orderId: string) {
     //----> Check for the existence of order in the database.
     const retrieveOrder = await this.getOrderById(orderId);
@@ -142,8 +149,24 @@ export class OrderDb {
     const orders = await prisma.order.findMany({
       where: { userId: user?.id },
     });
-    //----> Delete all these others in the database.
-    this.allOrdersDeletedByUserId(orders, user?.id);
+
+    //----> Check for availability of orders.
+    if (!!orders.length) {
+      //----> Delete all these others in the database.
+      this.allOrdersDeletedByUserId(orders, user?.id);
+
+      //----> Send back the result.
+      return {
+        status: "success",
+        message: "All orders are deleted successfully!",
+      };
+    }else {
+      //----> Send back the result.
+      return {
+        status: "fail",
+        message: "No orders available in database!",
+      };
+    }
   }
 
   async editAllOrderDetailsByOrderId(

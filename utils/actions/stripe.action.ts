@@ -1,33 +1,41 @@
-import Stripe from "stripe"
+import Stripe from "stripe";
 import { orderDb } from "~~/utils/db/order.db";
 import { stripeDb } from "~~/utils/db/stripe.db";
 import type { OrderPayload } from "~~/models/orders/orderPayload.model";
 
-
-export async function createPaymentIntent(amount: number, description: string){
+export async function createPaymentIntent(amount: number, description: string) {
   const stripeSecretKey = useRuntimeConfig().stripeSecretKey;
-  
-  const stripe = new Stripe(stripeSecretKey,{
+
+  const stripe = new Stripe(stripeSecretKey, {
     typescript: true,
-    apiVersion: "2025-01-27.acacia"
+    apiVersion: "2025-05-28.basil",
   });
 
-  const {id, description : desc, client_secret} = await stripe.paymentIntents.create({amount, description, currency: "usd"});
+  const {
+    id,
+    description: desc,
+    client_secret,
+  } = await stripe.paymentIntents.create({
+    amount,
+    description,
+    currency: "usd",
+  });
 
-
-  return {id, description, client_secret};
+  return { id, description, client_secret };
 }
 
-export async function stripePaymentCheckout(orderPayload: OrderPayload, origin: string){
+export async function stripePaymentCheckout(
+  orderPayload: OrderPayload,
+  origin: string
+) {
+  const sessionPayload = await stripeDb.paymentCheckout(orderPayload, origin);
 
-    const sessionPayload = await stripeDb.paymentCheckout(orderPayload, origin);
+  //-----> If there's sessionPayload, then store the order in the database.
+  if (sessionPayload?.id) {
+    orderPayload.paymentId = sessionPayload?.id;
+    orderPayload.orderDate = new Date();
+    await orderDb.orderCreate(orderPayload);
+  }
 
-    //-----> If there's sessionPayload, then store the order in the database.
-    if (sessionPayload?.id) {
-      orderPayload.paymentId = sessionPayload?.id;
-      orderPayload.orderDate = new Date();
-      await orderDb.orderCreate(orderPayload);
-    }
-
-    return sessionPayload;
+  return sessionPayload;
 }

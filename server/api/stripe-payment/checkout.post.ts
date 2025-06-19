@@ -2,6 +2,7 @@ import { OrderPayload } from "~~/models/orders/orderPayload.model";
 import { stripePaymentCheckout } from "~~/utils/actions/stripe.action";
 
 export default defineEventHandler(async(event) => {
+  console.log("In stripe")
   //----> Get the origin.
   const origin = event.headers.get('origin')
   //----> Check for admin privilege

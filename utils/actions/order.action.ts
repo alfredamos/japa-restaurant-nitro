@@ -30,14 +30,17 @@ export const deleteOrderByIdAction = async (id: string) => {
   return deletedOrder;
 };
 
+export const deleteAllOrdersAction = async() => {
+  await await orderDb.deleteAllOrders()
+
+  return {status: "success", message: "All orders are deleted successfully!"}
+}
+
 export const deleteOrdersByUserIdAction = async (userId: string) => {
   //----> Delete orders user id.
-  await orderDb.deleteOrdersByUserId(userId);
+  const result = await orderDb.deleteOrdersByUserId(userId);
   //----> Send back the response.
-  return {
-    message:
-      "All Orders associated with this customer have been deleted successfully!",
-  };
+  return result
 };
 
 export const editOrderByIdAction = async (orderToEdit: Order) => {
