@@ -7,14 +7,14 @@
     "preview": "node .output/server/index.mjs"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie": "^0.6.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cookie": "^1.0.0",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/stripe": "^8.0.416",
+    "@types/stripe": "^8.0.417",
     "nitropack": "^2.11.12"
   },
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
     "http-status-codes": "^2.3.0",
@@ -22,6 +22,7 @@
     "stripe": "^18.2.1",
     "url-pattern": "^1.0.3",
     "uuid": "^11.1.0",
+    "uuid-tool": "^2.0.3",
     "zod": "^3.25.67"
   }
 }

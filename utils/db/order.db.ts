@@ -56,6 +56,9 @@ export class OrderDb {
 
     //----> Delete all orders.
     await prisma.order.deleteMany({});
+
+    //----> Send back the response.
+    return {status: "success", message: "All orders are deleted successfully!"};
   }
   async deleteAllOrderDetailByOrderId(orderId: string) {
     //----> Check for the existence of order in the database.
