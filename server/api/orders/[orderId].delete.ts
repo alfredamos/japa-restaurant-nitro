@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
             event,
             createError({
               statusCode: StatusCodes.UNAUTHORIZED,
-              statusMessage: "You are authorized to delete this order!",
+              statusMessage: "You are not authorized to delete this order!",
             })
           );
         }

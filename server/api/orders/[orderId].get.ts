@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
           event,
           createError({
             statusCode: StatusCodes.UNAUTHORIZED,
-            statusMessage: "You are authorized to view these orders!",
+            statusMessage: "You are not authorized to view this order!",
           })
         );
       }

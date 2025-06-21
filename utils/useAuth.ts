@@ -5,8 +5,10 @@ import { initialUserCredential } from "./initialUserCredentials";
 import { TokenJwt } from "~~/models/auth/TokenJwt";
 import { Role } from "@prisma/client";
 import { isProtectedRoute } from "./protectedRoute";
-import { UuidTool } from "uuid-tool";
+import pkg from "uuid-tool";
 import { getOrderByIdAction } from "./actions/order.action";
+
+const { UuidTool } = pkg;
 
 export function useAuth() {
   //----> get global event.
@@ -313,14 +315,13 @@ export function useAuth() {
 
     //----> Check for admin.
     const isAdmin = userRole === Role.Admin;
-  
+
     //----> Check for ownership.
-    const isOwner = UuidTool.compare(userId, userIdFromOrder)
+    const isOwner = UuidTool.compare(userId, userIdFromOrder);
 
     //----> Send back results.
-    return {isAdmin, isOwner}
-  
-  }
+    return { isAdmin, isOwner };
+  };
 
   //----> send back the response.
   return {

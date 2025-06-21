@@ -58,8 +58,12 @@ export class OrderDb {
     await prisma.order.deleteMany({});
 
     //----> Send back the response.
-    return {status: "success", message: "All orders are deleted successfully!"};
+    return {
+      status: "success",
+      message: "All orders are deleted successfully!",
+    };
   }
+
   async deleteAllOrderDetailByOrderId(orderId: string) {
     //----> Check for the existence of order in the database.
     const retrieveOrder = await this.getOrderById(orderId);
@@ -113,8 +117,6 @@ export class OrderDb {
   }
 
   async deleteOrderById(id: string) {
-    //----> Check for the existence of order in the database.
-    await this.getOrderById(id);
     //----> Delete all associated cart-items.
     await prisma.order.update({
       where: { id },
@@ -163,7 +165,7 @@ export class OrderDb {
         status: "success",
         message: "All orders are deleted successfully!",
       };
-    }else {
+    } else {
       //----> Send back the result.
       return {
         status: "fail",
@@ -197,8 +199,6 @@ export class OrderDb {
   }
 
   async editOrder(id: string, orderToEdit: Order) {
-    //----> Check for the existence of order in the db.
-    await this.getOrderById(id);
     //----> Store the edited order info in the database.
     const editedOrder = await prisma.order.update({
       where: { id },
@@ -239,12 +239,23 @@ export class OrderDb {
 
   private async getOrderById(id: string, include: boolean = false) {
     //----> Retrieve the order info with this id from database.
-    const order = await prisma.order.findUniqueOrThrow({
+    const order = await prisma.order.findUnique({
       where: { id },
       include: {
         orderDetails: include,
       },
     });
+
+    //----> Check for existence of order.
+    if (!order) {
+      throw createError({
+        stack: "stack",
+        statusMessage: "Not found",
+        statusCode: StatusCodes.NOT_FOUND,
+        message: `Order with id : ${id} is not found!`,
+      });
+    }
+
     //----> Send back a valid order.
     return order;
   }
