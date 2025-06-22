@@ -1,21 +1,9 @@
-import { StatusCodes } from "http-status-codes";
 import { deleteAllOrdersAction } from "~~/utils/actions/order.action";
-import { useAuth } from "~~/utils/useAuth";
+import { getAndDeleteAllOrders } from "~~/utils/adminGetAndDeleteAllOrders";
 
-export default defineEventHandler(async (event) => {
-  //----> Get the isAdmin flag.
-  const {isUserAdmin} = useAuth();
-  const isAdmin = isUserAdmin()
-        //----> Check for same user and admin user.
-        if (!isAdmin){
-          sendError(
-            event,
-            createError({
-              statusCode: StatusCodes.UNAUTHORIZED,
-              statusMessage: "You are not authorized to delete these orders!",
-            })
-          );
-        }
+export default defineEventHandler(async (_event) => {
+  //---> Check for admin privilege to delete all or get all.
+  getAndDeleteAllOrders();
 
   //----> Delete all orders associated with this user.
   const response = await deleteAllOrdersAction();

@@ -5,10 +5,8 @@ import { initialUserCredential } from "./initialUserCredentials";
 import { TokenJwt } from "~~/models/auth/TokenJwt";
 import { Role } from "@prisma/client";
 import { isProtectedRoute } from "./protectedRoute";
-import pkg from "uuid-tool";
 import { getOrderByIdAction } from "./actions/order.action";
-
-const { UuidTool } = pkg;
+import { H3EventFetch } from "nitropack";
 
 export function useAuth() {
   //----> get global event.
@@ -299,7 +297,7 @@ export function useAuth() {
     const isAdmin = userRole === Role.Admin;
 
     //----> Check for same-user.
-    const isSameUser = UuidTool.compare(userIdFromAuth, userId);
+    const isSameUser = userIdFromAuth.normalize() === userId.normalize();
 
     //----> Send back the response.
     return { isAdmin, isSameUser };
@@ -317,7 +315,7 @@ export function useAuth() {
     const isAdmin = userRole === Role.Admin;
 
     //----> Check for ownership.
-    const isOwner = UuidTool.compare(userId, userIdFromOrder);
+    const isOwner = userId.normalize() === userIdFromOrder.normalize();
 
     //----> Send back results.
     return { isAdmin, isOwner };

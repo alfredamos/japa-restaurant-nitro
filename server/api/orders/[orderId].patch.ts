@@ -1,25 +1,12 @@
 import { Order } from "@prisma/client";
-import { StatusCodes } from "http-status-codes";
 import { editOrderByIdAction } from "~~/utils/actions/order.action";
-import { useAuth } from "~~/utils/useAuth";
+import { ownerAndAdmin } from "~~/utils/ownerAndAdmin";
 
 export default defineEventHandler(async (event) => {
   const validatedBody = await readBody<Order>(event);
 
-  //----> Get ownership and is-admin flags.
-        const {checkForOwnershipAndAdmin} = useAuth();
-        const {isAdmin, isOwner} = await checkForOwnershipAndAdmin(validatedBody?.id);
-      
-        //----> Check for same user and admin user.
-        if (!isAdmin && !isOwner){
-          sendError(
-            event,
-            createError({
-              statusCode: StatusCodes.UNAUTHORIZED,
-              statusMessage: "You are not authorized to edit this order.!",
-            })
-          );
-        }
+   //----> Check for ownership or admin.
+    await ownerAndAdmin(validatedBody?.id)
 
   //----> Edit the given order.
   const response = await editOrderByIdAction(validatedBody);
