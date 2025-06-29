@@ -1,12 +1,12 @@
 -- CreateTable
 CREATE TABLE `order-details` (
     `id` VARCHAR(191) NOT NULL,
-    `itemName` VARCHAR(191) NOT NULL,
+    `itemName` VARCHAR(255) NOT NULL,
     `price` DOUBLE NOT NULL,
     `quantity` INTEGER NOT NULL,
-    `menuItemId` VARCHAR(191) NULL,
-    `orderId` VARCHAR(191) NULL,
-    `image` VARCHAR(191) NOT NULL,
+    `menuItemId` VARCHAR(255) NULL,
+    `orderId` VARCHAR(255) NULL,
+    `image` VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -30,11 +30,11 @@ CREATE TABLE `users` (
 -- CreateTable
 CREATE TABLE `orders` (
     `id` VARCHAR(191) NOT NULL,
-    `paymentId` VARCHAR(255) NOT NULL,
+    `paymentId` VARCHAR(255) NOT NULL DEFAULT 'wyhjuu4785ndndrnv89',
     `orderDate` DATETIME(3) NOT NULL,
     `totalQuantity` INTEGER NOT NULL,
     `totalPrice` DOUBLE NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(255) NOT NULL,
     `status` ENUM('Cancelled', 'Completed', 'Confirmed', 'Pickup') NOT NULL DEFAULT 'Confirmed',
 
     UNIQUE INDEX `orders_paymentId_key`(`paymentId`),
@@ -44,13 +44,13 @@ CREATE TABLE `orders` (
 -- CreateTable
 CREATE TABLE `menu-items` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
+    `itemName` VARCHAR(255) NOT NULL,
     `category` VARCHAR(255) NOT NULL,
     `price` DOUBLE NOT NULL,
     `specialTag` VARCHAR(255) NOT NULL,
     `image` VARCHAR(255) NOT NULL,
     `description` VARCHAR(255) NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

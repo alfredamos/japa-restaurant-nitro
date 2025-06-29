@@ -1,7 +1,7 @@
 import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler((event) => {
-  console.log("In admin-middleware");
+  console.log("In admin-middleware, path : ", event._path);
   //----> Get use-auth.
   const {adminUser, isUserAdmin} = useAuth();
 

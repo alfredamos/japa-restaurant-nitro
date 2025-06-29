@@ -55,7 +55,12 @@ export class OrderDb {
     await prisma.orderDetail.deleteMany({});
 
     //----> Delete all orders.
-    await prisma.order.deleteMany({});
+    const numberOfOrders = (await prisma.order.deleteMany({})).count;
+
+    //----> Check for empty array of orders.
+    if (!numberOfOrders){
+      throw createError("Orders are not available in the database!")
+    }
 
     //----> Send back the response.
     return {
@@ -213,6 +218,11 @@ export class OrderDb {
     const allOrders = await prisma.order.findMany({
       include: { orderDetails: true, user: true },
     });
+
+    //----> Check for existence of orders.
+    if (!allOrders.length) {
+      throw createError("Orders are not available!");
+    }
 
     return allOrders;
   }
