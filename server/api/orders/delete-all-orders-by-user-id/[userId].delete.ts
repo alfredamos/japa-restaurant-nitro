@@ -1,9 +1,10 @@
-import { StatusCodes } from "http-status-codes";
 import { deleteOrdersByUserIdAction } from "~~/utils/actions/order.action";
-import { sameUserAndAdmin } from "~~/utils/sameUserAndAdmin";
 import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler(async (event) => {
+  //----> Get same user and admin checker.
+  const {sameUserAndAdmin} = useAuth()
+  
   //----> Get the user-id from params.
   const userId = getRouterParam(event, 'userId');
 

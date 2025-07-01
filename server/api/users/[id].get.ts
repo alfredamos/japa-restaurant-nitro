@@ -1,8 +1,11 @@
 import { getUserByIdAction } from "~~/utils/actions/user.action";
-import { sameUserAndAdmin } from "~~/utils/sameUserAndAdmin";
+import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
+
+  //----> Get same user and admin checker.
+  const {sameUserAndAdmin} = useAuth()
 
   //----> Check for same user or admin.
   sameUserAndAdmin(id);
