@@ -99,6 +99,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.UNAUTHORIZED,
           statusMessage: "Invalid credentials!",
+          stack: "Access denied!",
         })
       );
     }
@@ -111,7 +112,7 @@ export function useAuth() {
           event,
           createError({
             statusCode: StatusCodes.UNAUTHORIZED,
-            statusMessage: "You are already logged out!",
+            stack: "Access denied!",
           })
         );
     }
@@ -124,6 +125,7 @@ export function useAuth() {
           createError({
             statusCode: StatusCodes.UNAUTHORIZED,
             statusMessage: "You are already logged out!",
+            stack: "Access denied!",
           })
         );
       return sendError(
@@ -131,6 +133,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.UNAUTHORIZED,
           statusMessage: "Invalid credential!",
+          stack: "Access denied!",
         })
       );
     }
@@ -162,6 +165,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.UNAUTHORIZED,
           statusMessage: "Invalid credentials!",
+          stack: "Access denied!",
         })
       );
     }
@@ -186,6 +190,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.FORBIDDEN,
           statusMessage: "You are not permitted to view this page!",
+          stack: "Access denied!",
         })
       );
     }
@@ -205,6 +210,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.UNAUTHORIZED,
           statusMessage: "Invalid credentials!",
+          stack: "Access denied!",
         })
       );
     }
@@ -223,6 +229,7 @@ export function useAuth() {
         createError({
           statusCode: StatusCodes.UNAUTHORIZED,
           statusMessage: "Invalid credentials!",
+          stack: "Access denied!",
         })
       );
     }
@@ -320,7 +327,7 @@ export function useAuth() {
     return { isAdmin, isOwner };
   };
 
-  const ownerAndAdmin = async(orderId: string) =>{
+  const ownerAndAdmin = async (orderId: string) => {
     //const { checkForOwnershipAndAdmin } = useAuth();
     console.log("In ownerAndAdmin-middleware, orderId : ", orderId);
     //----> Run the middleware only when order-id is not null.
@@ -333,13 +340,13 @@ export function useAuth() {
           statusCode: StatusCodes.UNAUTHORIZED,
           message: "You are not authorized on this page!",
           statusMessage: "Not Authorized",
-          stack: undefined,
+          stack: "Access denied!",
         });
       }
     }
-  }
+  };
 
-  const sameUserAndAdmin = (userId: string) =>{
+  const sameUserAndAdmin = (userId: string) => {
     //----> Get same user and is-admin flags.
     //const { checkForSameUserAndAdmin } = useAuth();
     console.log("In sameUserAndAdmin-middleware");
@@ -348,15 +355,18 @@ export function useAuth() {
       const { isAdmin, isSameUser } = checkForSameUserAndAdmin(userId);
       //----> Check for same user and admin user.
       if (!isAdmin && !isSameUser) {
-        throw sendError(event, createError({
-          statusCode: StatusCodes.UNAUTHORIZED,
-          message: "You are not authorized on this page!",
-          statusMessage: "Not Authorized",
-          stack: undefined,
-        }));
+        throw sendError(
+          event,
+          createError({
+            statusCode: StatusCodes.UNAUTHORIZED,
+            message: "You are not authorized on this page!",
+            statusMessage: "Not Authorized",
+            stack: "Access denied!",
+          })
+        );
       }
     }
-  }
+  };
 
   //----> send back the response.
   return {

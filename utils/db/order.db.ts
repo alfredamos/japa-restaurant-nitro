@@ -58,8 +58,12 @@ export class OrderDb {
     const numberOfOrders = (await prisma.order.deleteMany({})).count;
 
     //----> Check for empty array of orders.
-    if (!numberOfOrders){
-      throw createError("Orders are not available in the database!")
+    if (!numberOfOrders) {
+      throw createError({
+        statusCode: StatusCodes.NOT_FOUND,
+        statusMessage: "Orders are not available in the database!",
+        stack: "Empty table!",
+      });
     }
 
     //----> Send back the response.
@@ -152,6 +156,7 @@ export class OrderDb {
       throw createError({
         statusCode: StatusCodes.UNAUTHORIZED,
         statusMessage: "Invalid credentials!",
+        stack: "Access denied",
       });
     }
 
@@ -221,7 +226,11 @@ export class OrderDb {
 
     //----> Check for existence of orders.
     if (!allOrders.length) {
-      throw createError("Orders are not available!");
+      throw createError({
+        statusCode: StatusCodes.NOT_FOUND,
+        statusMessage: "Orders are not available in the database!",
+        stack: "Empty table!",
+      });
     }
 
     return allOrders;
@@ -236,6 +245,14 @@ export class OrderDb {
         user: true,
       },
     });
+
+    if (!allOrders.length) {
+      throw createError({
+        statusCode: StatusCodes.NOT_FOUND,
+        message: "Orders are not available in the database for this user",
+        stack: "Empty table!",
+      });
+    }
 
     return allOrders;
   }

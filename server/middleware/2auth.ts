@@ -17,5 +17,5 @@ export default defineEventHandler(async(event) => {
   //----> Check for jwt availability.
   if(!isPublic && isAuthenticated)getAuth();
   else if(!isPublic && !isAuthenticated)
-   throw sendError(event, createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials!"}))
+   throw sendError(event, createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials!", stack: "Access denied!"}))
 })

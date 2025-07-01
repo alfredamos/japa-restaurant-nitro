@@ -11,7 +11,7 @@ export class OrderDetailDb {
     const newOrderDetail = await prisma.orderDetail.create({ data: orderDetail });
 
     if (!newOrderDetail) {
-      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage: "OrderDetail not created"});
+      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage: "OrderDetail not created", stack: "Bad request!"});
     }
 
     return newOrderDetail;
@@ -26,7 +26,7 @@ export class OrderDetailDb {
     });
 
     if (!editedOrderDetail) {
-      throw createError({statusCode: StatusCodes.BAD_REQUEST,statusMessage:`OrderDetail with id: ${id} cannot be updated`});
+      throw createError({statusCode: StatusCodes.BAD_REQUEST,statusMessage:`OrderDetail with id: ${id} cannot be updated`, stack: "Bad request!"});
     }
 
     return editedOrderDetail;
@@ -44,7 +44,7 @@ export class OrderDetailDb {
     const orderDetail = await prisma.orderDetail.findUnique({ where: { id } });
 
     if (!orderDetail) {
-      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage:`OrderDetail with id: ${id} is not found`});
+      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage:`OrderDetail with id: ${id} is not found`, stack: "Not available!"});
     }
 
     return orderDetail;

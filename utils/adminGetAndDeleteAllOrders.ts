@@ -12,7 +12,7 @@ export function getAndDeleteAllOrders(){
       statusCode: StatusCodes.UNAUTHORIZED,
       message: "You are not authorized on this page!",
       statusMessage: "Not Authorized",
-      stack: undefined
+      stack: "Access denied!"
     });
   } 
   

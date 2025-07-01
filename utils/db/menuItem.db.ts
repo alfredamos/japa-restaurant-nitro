@@ -11,7 +11,7 @@ export class MenuItemDb {
     const newMenuItem = await prisma.menuItem.create({ data: menuItem as MenuItem });
 
     if (!newMenuItem) {
-      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage: "MenuItem not created"});
+      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage: "MenuItem not created", stack: "Bad request!"});
     }
 
     return newMenuItem;
@@ -26,7 +26,7 @@ export class MenuItemDb {
     });
 
     if (!editedMenuItem) {
-      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage:`MenuItem with id: ${id} cannot be updated`});
+      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage:`MenuItem with id: ${id} cannot be updated`, stack: "MenuItem not in database!"});
     }
 
     return editedMenuItem;
@@ -44,7 +44,11 @@ export class MenuItemDb {
     const menuItem = await prisma.menuItem.findUnique({ where: { id } });
 
     if (!menuItem) {
-      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage:`MenuItem with id: ${id} is not found`});
+      throw createError({
+        statusCode: StatusCodes.NOT_FOUND,
+        statusMessage: `MenuItem with id: ${id} is not found`,
+        stack: "MenuItem not in database!",
+      });
     }
 
     return menuItem;

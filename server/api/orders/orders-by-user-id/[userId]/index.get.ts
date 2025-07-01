@@ -4,8 +4,8 @@ import { useAuth } from "~~/utils/useAuth";
 
 export default defineEventHandler(async (event) => {
   //----> Get same user and admin checker
-  const {sameUserAndAdmin} = useAuth()
-  
+  const { sameUserAndAdmin } = useAuth();
+
   //----> Get the user-id from param.
   const userId = getRouterParam(event, "userId");
 
@@ -14,6 +14,18 @@ export default defineEventHandler(async (event) => {
 
   //----> Get orders associated with thi user.
   const response = await getAllOrdersByUserIdAction(userId);
+
+  //----> Check for existence of orders.
+  if (!response) {
+    throw sendError(
+      event,
+      createError({
+        statusCode: StatusCodes.NOT_FOUND,
+        message: "Orders are not available in the database!",
+        stack: "Empty database!"
+      })
+    );
+  }
 
   //----> Send back the response.
   return response;

@@ -23,7 +23,7 @@ export class AuthDb {
 
     //----> Check for password match
     if (!this.matchPassword(newPassword, confirmPassword)) {
-      throw createError({statusCode:StatusCodes.BAD_REQUEST, statusMessage: "Password must match!"});
+      throw createError({statusCode:StatusCodes.BAD_REQUEST, statusMessage: "Password must match!", stack: "Access denied!"});
     }
 
     //----> Get user from database.
@@ -32,7 +32,7 @@ export class AuthDb {
     //----> Check that the old password is correct.
     const isMatch = await this.comparePassword(oldPassword, user);
     if (!isMatch) {
-      throw createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials "});
+      throw createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials ", stack: "Access denied!"});
     }
 
     //----> Hash the new password.
@@ -170,7 +170,8 @@ export class AuthDb {
     if (!isAdmin) {
       throw createError({
         statusCode: StatusCodes.FORBIDDEN,
-        statusMessage: "You are not permitted to perform this task!"
+        statusMessage: "You are not permitted to perform this task!",
+        stack: "Access denied!"
     });
     }
 
@@ -181,8 +182,9 @@ export class AuthDb {
     if (!user) {
       throw createError({
         statusCode: StatusCodes.NOT_FOUND,
-        statusMessage: "This user is not in the database!"
-    });
+        statusMessage: "This user is not in the database!",
+        stack: "User not available in database!"
+      });
     }
 
     //----> Make the user an admin.
@@ -217,7 +219,7 @@ export class AuthDb {
     });
     //----> Check for existence of user.
     if (!user) {
-      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage: "Invalid credentials!"});
+      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage: "Invalid credentials!", stack: "Access denied!"});
     }
 
     //----> Send back the result.
@@ -230,7 +232,7 @@ export class AuthDb {
 
     //----> Check for existence of user.
     if (!user) {
-      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage: "Invalid credential!"});
+      throw createError({statusCode: StatusCodes.NOT_FOUND, statusMessage: "Invalid credential!", stack: "Access denied!"});
     }
 
     //----> Send back the result.
@@ -244,7 +246,7 @@ export class AuthDb {
 
     //----> Check if the two passwords match.
     if (!isMatch) {
-      throw createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials!"});
+      throw createError({statusCode: StatusCodes.UNAUTHORIZED, statusMessage: "Invalid credentials!", stack: "Access denied!"});
     }
 
     //----> Send back the result.
@@ -264,7 +266,7 @@ export class AuthDb {
   ) {
     //----> Check for password match
     if (!this.matchPassword(password, confirmPassword)) {
-      throw createError({statusCode:StatusCodes.BAD_REQUEST, statusMessage: "Password must match!"});
+      throw createError({statusCode:StatusCodes.BAD_REQUEST, statusMessage: "Password must match!", stack: "Access denied!"});
     }
 
     //----> Get user from database.
@@ -272,7 +274,7 @@ export class AuthDb {
 
     //----> Check for existence of user.
     if (user) {
-      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage:"User already exists!"});
+      throw createError({statusCode: StatusCodes.BAD_REQUEST, statusMessage:"User already exists!", stack: "Access denied!"});
     }
   }
 
